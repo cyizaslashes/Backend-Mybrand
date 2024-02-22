@@ -1,14 +1,38 @@
 import "dotenv/config";
 import express, { NextFunction,Request,Response } from "express";
 import blogroutes from "../src/routes/blogs";
+import messageRoutes from "../src/routes/message";
+import userRoutes from "../src/routes/users";
 import createHttpError, {isHttpError} from "http-errors";
+import session from "express-session";
+import env from "./util/validatenv";
+import MongoStore from "connect-mongo";
+import getusertestRoute from "../src/routes/getAllusers";
+import { requiresAuth } from "./middleware/auth";
+import CommentRoutes from "../src/routes/comment";
 //import morgan  from "morgan";
 
 const app = express();
 //app.use(morgan("dev"));
 app.use(express.json());
+app.use(session({
+    secret: env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        maxAge: 60*60*1000,
+    },
+    rolling: true,
+    store: MongoStore.create({
+        mongoUrl: env.MONGO_CONNECTION_STRING
+    }),
+}));
 
-app.use("/api/blogs", blogroutes);
+app.use("/api/blogs",blogroutes);
+app.use("/api/users", userRoutes);
+app.use("/api/message", messageRoutes);
+app.use("/api/test/",getusertestRoute);
+app.use("/api/comments",CommentRoutes);
 
 app.use((req, res, next)=>{
     next(createHttpError(404,"Endpoint not found"));
