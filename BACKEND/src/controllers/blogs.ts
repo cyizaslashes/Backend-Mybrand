@@ -44,6 +44,7 @@ export const getBlog: RequestHandler = async (req,res,next) => {
 };
 
 interface CreatBlogBody{
+    status?: string,
     title?: string,
     text?: string,
 }

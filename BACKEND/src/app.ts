@@ -10,12 +10,15 @@ import MongoStore from "connect-mongo";
 import getusertestRoute from "../src/routes/getAllusers";
 import { requiresAuth } from "./middleware/auth";
 import CommentRoutes from "../src/routes/comment";
+import limiter  from "express-rate-limit"
 //import morgan  from "morgan";
+
 
 const app = express();
 //app.use(morgan("dev"));
 app.use(express.json());
-app.use(session({
+
+    app.use(session({
     secret: env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -28,6 +31,14 @@ app.use(session({
     }),
 }));
 
+
+
+const RateLimit = limiter({
+    windowMs: 30 * 60 * 1000,
+    max: 100,
+    message: 'Too many requests from this IP, please try again in 30 minutes.'
+});
+app.use("/api",RateLimit)
 app.use("/api/blogs",blogroutes);
 app.use("/api/users", userRoutes);
 app.use("/api/message", messageRoutes);

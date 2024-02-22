@@ -4,6 +4,7 @@ import { InferSchemaType } from "mongoose";
 import UserModel from "../Models/user";
 import bcrypt from "bcrypt";
 import session from "express-session";
+import jwt from "jsonwebtoken"
 
 export const getAuthenticatedUser: RequestHandler = async(req,res,next)=>{
 
